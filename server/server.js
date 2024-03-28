@@ -1,8 +1,14 @@
 import { ApolloServer } from '@apollo/server';
-import { startStandaloneServer } from '@apollo/server/standalone';
+import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import express from 'express';
+import http from 'http';
+import cors from 'cors';
 import dbConnect from './src/config/dbConnect.js';
 import resolvers from './src/resolvers.js';
 import typeDefs from './src/typeDefs.js';
+const app = express();
+const httpServer = http.createServer(app);
 const conn = dbConnect();
 if(conn) {
     console.log("Database connected Successfully");
@@ -14,10 +20,15 @@ if(conn) {
 const server = new ApolloServer({
     typeDefs,
     resolvers,
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 });
-  
-const { url } = await startStandaloneServer(server, {
-    listen: { port:  process.env.PORT || 5000 },
-});
-  
-console.log(`🚀  Server ready at: ${url}`);
+
+await server.start();
+app.use(
+    '/',
+    cors(),
+    express.json(),
+    expressMiddleware(server),
+  );
+  await new Promise((resolve) => httpServer.listen({ port: process.env.PORT || 5000 }, resolve));
+console.log(`🚀Server ready at: http://localhost:${process.env.PORT || 5000}/`);

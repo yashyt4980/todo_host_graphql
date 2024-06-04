@@ -7,6 +7,7 @@ import cors from 'cors';
 import dbConnect from './src/config/dbConnect.js';
 import resolvers from './src/resolvers.js';
 import typeDefs from './src/typeDefs.js';
+import path from 'path'
 const app = express();
 const httpServer = http.createServer(app);
 const conn = dbConnect();
@@ -26,6 +27,7 @@ const server = new ApolloServer({
 await server.start();
 app.use(
     '/',
+    express.static(path.join(path.resolve(), '../client/dist')),
     cors(),
     express.json(),
     expressMiddleware(server),

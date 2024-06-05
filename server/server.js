@@ -29,7 +29,7 @@ const server = new ApolloServer({
 await server.start();
 
 const corsOptions = {
-    origin: 'https://graphql-todo-v1.netlify.app/', // Replace with your client's origin
+    origin: 'https://graphql-todo-v1.netlify.app', // Replace with your client's origin
     credentials: true, // If you need to send cookies or authorization headers
 };
 
